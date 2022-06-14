@@ -1,3 +1,4 @@
+from msilib.schema import File
 from tkinter import Button
 
 def prueba1():
@@ -5,16 +6,16 @@ def prueba1():
     import FileSystem
     from threading import Thread
     vista = Vista.Vista()
-    directorio = FileSystem.Directorio("S:")
-    directorio.directorios.append(FileSystem.Directorio("documentos"))
-    directorio.directorios.append(FileSystem.Directorio("imágenes"))
-    directorio.directorios.append(FileSystem.Directorio("videos"))
-    escritorio = FileSystem.Directorio("escritorio")
-    escritorio.directorios.append(FileSystem.Directorio("juegos"))
-    escritorio.archivos.append(FileSystem.Archivo("progra1.py","print('hola mundo')"))
-    directorio.directorios.append(escritorio)
-    directorio.directorios.append(FileSystem.Directorio("programas"))
-    b = Button(vista, text='Actualizar árbol', command=lambda:vista.actualizarArbol(directorio))
+    FileSystem = FileSystem.FileSystem()
+    FileSystem.crear_archivo("archivo1.txt", "contenido1")
+    FileSystem.crear_directorio("escritorio")
+    FileSystem.cambiar_directorio("escritorio")
+    FileSystem.crear_directorio("juegos")
+    FileSystem.crear_archivo("progra1.py","print('hola mundo')")
+    FileSystem.cambiar_directorio("juegos")
+    FileSystem.crear_archivo("juego1.exe", "contenido2")
+    FileSystem.crear_archivo("juego2.exe", "contenido3")
+    b = Button(vista, text='Actualizar árbol', command=lambda:vista.actualizarArbol(FileSystem.raiz))
     b.grid(row=1, column=0)
     vista.mainloop()
 prueba1()
