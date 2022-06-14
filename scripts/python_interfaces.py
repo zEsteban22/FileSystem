@@ -1,3 +1,4 @@
+#https://realpython.com/python-interface/
 from abc import ABCMeta, abstractmethod
 
 class Interface(metaclass=ABCMeta):
