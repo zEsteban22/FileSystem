@@ -1,6 +1,5 @@
 from tkinter import Button
 
-
 def prueba1():
     import Vista
     import FileSystem
