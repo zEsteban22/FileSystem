@@ -12,12 +12,12 @@ class Vista(Tk):
         self.tree.grid(row=0, column=0, sticky='nsew')
     def actualizarArbol(self,raiz:Directorio):
         self.tree.delete(*self.tree.get_children())
-        self.tree.insert('', END, text=raiz.nombre, iid=raiz.id, open=False)
+        self.tree.insert('', END, text=raiz.nombre, iid=raiz.id, open=raiz.abierto)
         self.generarArbol(raiz)
     def generarArbol(self,raiz:Directorio):
         for archivo in raiz.archivos:
             self.tree.insert(raiz.id, END, text=archivo.nombre, iid=archivo.id, open=False)
         for directorio in raiz.directorios:
-            self.tree.insert(raiz.id, END, text=directorio.nombre, iid=directorio.id, open=False)
+            self.tree.insert(raiz.id, END, text=directorio.nombre, iid=directorio.id, open=directorio.abierto)
             self.generarArbol(directorio)
     

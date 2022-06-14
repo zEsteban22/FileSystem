@@ -16,6 +16,7 @@ class Directorio(Elemento):
         self.nombre = nombre
         self.archivos = []
         self.directorios = []
+        self.abierto = False
 
 class FileSystem:
     def __init__(self, cantidad_sectores:int = 10, tamaño_sector:int = 8):
