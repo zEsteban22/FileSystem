@@ -2,7 +2,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import showinfo
-
+from random import randint
 # create root window
 root = tk.Tk()
 root.title('Treeview Demo - Hierarchical Data')
@@ -27,10 +27,14 @@ tree.insert('', tk.END, text='John Doe', iid=5, open=False)
 tree.insert('', tk.END, text='Jane Doe', iid=6, open=False)
 # defining children of the nodes
 tree.move(5, 0, 0)
-tree.move(6, 5, 0)
+
+def mover_aleatorio():
+    tree.move(6, randint(0,5), 0)
 
 # place the Treeview widget on the root window
 tree.grid(row=0, column=0, sticky='nsew')
+boton = ttk.Button(root, text='mover', command=mover_aleatorio)
+boton.grid(row=1, column=0, sticky='nsew')
 
 # run the app
 root.mainloop()
