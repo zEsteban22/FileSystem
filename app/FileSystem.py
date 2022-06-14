@@ -29,7 +29,6 @@ class FileSystem:
     def crear_directorio(self, nombre:str):
         directorio = Directorio(nombre)
         self.actual_dir.directorios.append(directorio)
-        self.actual_dir = directorio
     def cambiar_directorio(self, nombre:str):
         for directorio in self.actual_dir.directorios:
             if directorio.nombre == nombre:
