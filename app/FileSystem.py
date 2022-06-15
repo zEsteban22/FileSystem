@@ -11,12 +11,13 @@ class Archivo(Elemento):
         self.contenido = contenido
 
 class Directorio(Elemento):
-    def __init__(self, nombre):
+    def __init__(self, nombre:str, papá=None):
         super().__init__()
         self.nombre = nombre
         self.archivos = []
         self.directorios = []
         self.abierto = False
+        self.papá = papá
 
 class FileSystem:
     def __init__(self):
@@ -30,14 +31,18 @@ class FileSystem:
         archivo = Archivo(nombre, contenido)
         self.actual_dir.archivos.append(archivo)
     def crear_directorio(self, nombre:str):
-        directorio = Directorio(nombre)
+        directorio = Directorio(nombre, self.actual_dir)
         self.actual_dir.directorios.append(directorio)
     def cambiar_directorio(self, nombre:str):
+        if nombre == '..':
+            if self.actual_dir.papá is None:
+                return "No se puede cambiar al directorio padre"
+            self.actual_dir = self.actual_dir.papá
         for directorio in self.actual_dir.directorios:
             if directorio.nombre == nombre:
                 self.actual_dir = directorio
-                return
-        raise Exception("No se encontró el directorio")
+                return "Cambiado al directorio " + nombre
+        return "No se encontró el directorio"
     def abrir_archivo(self, nombre:str):
         for archivo in self.actual_dir.archivos:
             if archivo.nombre == nombre:
