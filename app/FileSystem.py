@@ -1,7 +1,9 @@
 from ctypes import sizeof
+from hashlib import new
 from typing_extensions import Self
 from numpy import size
 from datetime import datetime
+from VistaPropiedades import *
 
 
 class Elemento:
@@ -99,7 +101,9 @@ class FileSystem:
     def ver_propiedades(self, filename:str):
         for archivo in self.actual_dir.archivos:
             if archivo.nombre==filename:
-                print("Archivo: " + archivo.nombre + "\nFecha de creacion: " + archivo.fecha_creacion+"\nUltima modificacion: "+archivo.fecha_modificacion)
+                text = ("Archivo: " + archivo.nombre + "\nFecha de creacion: " + archivo.fecha_creacion+"\nUltima modificacion: "+archivo.fecha_modificacion)
+                V1 = VistaPropiedades(text)
+                V1.mainloop()
 
     
 
