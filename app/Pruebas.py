@@ -1,7 +1,6 @@
 from msilib.schema import File
 from tkinter import Button
 
-
 def prueba1():
     import Vista
     import FileSystem
