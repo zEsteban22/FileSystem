@@ -39,5 +39,6 @@ def prueba1():
     FileSystem.crear_archivo("juego3.exe", "contenido4")
     vista.actualizarArbol()
     vista.mainloop()
+    
 
 prueba1()
