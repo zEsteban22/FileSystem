@@ -1,8 +1,8 @@
 class Elemento:
-    id = 1
+    id = 0
     def __init__(self):
-        self.id = Elemento.id
         Elemento.id += 1
+        self.id = Elemento.id
 
 class Archivo(Elemento):
     def __init__(self, nombre, contenido):
@@ -11,12 +11,12 @@ class Archivo(Elemento):
         self.contenido = contenido
 
 class Directorio(Elemento):
-    def __init__(self, nombre:str, papá=None):
+    def __init__(self, nombre:str, papá=None, abierto=False):
         super().__init__()
         self.nombre = nombre
         self.archivos = []
         self.directorios = []
-        self.abierto = False
+        self.abierto = abierto
         self.papá = papá
 
 class FileSystem:
@@ -25,8 +25,18 @@ class FileSystem:
     def inicializar(self, nombre, cantidad_sectores:int = 10, tamaño_sector:int = 8):
         self.cantidad_sectores = cantidad_sectores
         self.tamaño_sector = tamaño_sector
-        self.actual_dir = self.raiz = Directorio(nombre)
+        self.actual_dir = self.raiz = Directorio(nombre, abierto=True)
         return "Disco creado con éxito."
+    def tocar(self, id, r=None):
+        if r is None:
+            r = self.raiz
+        for directorio in r.directorios:
+            if directorio.id == id:
+                directorio.abierto = directorio.abierto == False
+                return directorio.abierto
+            self.tocar(directorio, id)
+        return False
+        
     def crear_archivo(self, nombre:str, contenido:str):
         archivo = Archivo(nombre, contenido)
         self.actual_dir.archivos.append(archivo)
