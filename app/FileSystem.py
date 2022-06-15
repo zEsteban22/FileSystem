@@ -38,11 +38,3 @@ class FileSystem:
                 self.actual_dir = directorio
                 return
         raise Exception("No se encontró el directorio")
-
-    def mod_archivo(self, nombre:str, contenido:str):
-        archivo = self.actual_dir.archivos[nombre]
-        archivo.contenido = contenido
-
-    def ver_archivo(self, nombre:str):
-        archivo = self.actual_dir.archivos[nombre]
-        print(archivo.nombre+ "\n"+ archivo.contenido)

@@ -12,7 +12,8 @@ def enviarComando(comando):
 def prueba1():
     import FileSystem
     vista = Vista.Vista()
-    FileSystem = FileSystem.FileSystem()
+    FileSystem = vista.FileSystem
+    FileSystem.inicializar("S:")
     FileSystem.crear_archivo("archivo1.txt", "contenido1")
     FileSystem.crear_directorio("escritorio")
     FileSystem.cambiar_directorio("escritorio")
@@ -35,6 +36,8 @@ def prueba1():
     b1 = Button(vista, text='Listo',width=15, font = ('Arial bold',10), command=enviarComando(comando))
     b1.grid(row=4,column=0)
 
+    FileSystem.crear_archivo("juego3.exe", "contenido4")
+    vista.actualizarArbol()
     vista.mainloop()
 
 prueba1()
