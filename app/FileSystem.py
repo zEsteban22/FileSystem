@@ -1,3 +1,8 @@
+from ctypes import sizeof
+from typing_extensions import Self
+from numpy import size
+
+
 class Elemento:
     id = 0
     def __init__(self):
@@ -22,11 +27,13 @@ class Directorio(Elemento):
 class FileSystem:
     def __init__(self):
         pass
+
     def inicializar(self, nombre, cantidad_sectores:int = 10, tamaño_sector:int = 8):
         self.cantidad_sectores = cantidad_sectores
         self.tamaño_sector = tamaño_sector
         self.actual_dir = self.raiz = Directorio(nombre, abierto=True)
         return "Disco creado con éxito."
+
     def tocar(self, id, r=None):
         if r is None:
             r = self.raiz
@@ -40,9 +47,11 @@ class FileSystem:
     def crear_archivo(self, nombre:str, contenido:str):
         archivo = Archivo(nombre, contenido)
         self.actual_dir.archivos.append(archivo)
+
     def crear_directorio(self, nombre:str):
         directorio = Directorio(nombre, self.actual_dir)
         self.actual_dir.directorios.append(directorio)
+
     def cambiar_directorio(self, nombre:str):
         if nombre == '..':
             if self.actual_dir.papá is None:
@@ -53,11 +62,40 @@ class FileSystem:
                 self.actual_dir = directorio
                 return "Cambiado al directorio " + nombre
         return "No se encontró el directorio"
+
     def abrir_archivo(self, nombre:str):
         for archivo in self.actual_dir.archivos:
             if archivo.nombre == nombre:
                 return archivo.contenido
         return "No se encontró el archivo"
+
+    def borrar_archivo(self, nombre:str):
+        for archivo in self.actual_dir.archivos:
+            if archivo.nombre==nombre:
+                self.actual_dir.archivos.remove(archivo)
+
+    #Las siguientes tres funciones son de la funcionalidad de buscar archivos
+    def buscar_aqui(self,nombre:str, dir:Directorio,ruta:str):
+        for archivo in dir.archivos:
+            if nombre in archivo.nombre:
+                print("Se encontró: " + ruta+ archivo.nombre)
+
+    def hay_directorios(self,nombre:str,directorio:Directorio,ruta:str):
+        self.buscar_aqui(nombre,directorio,ruta)
+        if size(directorio.directorios)>=1:
+            for dir in directorio.directorios:
+                print(dir.nombre)
+                return self.hay_directorios(nombre,dir,ruta+dir.nombre+"/")
+
+    def buscar_archivo(self, nombre:str):
+        ruta=self.raiz.nombre+"/"
+        self.hay_directorios(nombre,self.raiz,ruta)
+
+
+    
+
+    ###############################################################################
+
     def procesar_comando(self, comando:str):
         comando = comando.split(" ")
         if comando[0] == "inicializar":
@@ -73,6 +111,8 @@ class FileSystem:
             return "Creado el archivo " + comando[1]
         elif comando[0] == "cat":
             return self.abrir_archivo(comando[1])
+        elif comando[0] == "find":
+            return self.buscar_archivo(comando[1])
         else:
             return "Comando no reconocido."
 
