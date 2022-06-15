@@ -4,6 +4,7 @@ from typing_extensions import Self
 from numpy import size
 from datetime import datetime
 from VistaPropiedades import *
+from VistaContenido import *
 
 
 class Elemento:
@@ -102,8 +103,12 @@ class FileSystem:
         for archivo in self.actual_dir.archivos:
             if archivo.nombre==filename:
                 text = ("Archivo: " + archivo.nombre + "\nFecha de creacion: " + archivo.fecha_creacion+"\nUltima modificacion: "+archivo.fecha_modificacion)
-                V1 = VistaPropiedades(text)
-                V1.mainloop()
+                VistaPropiedades(text)
+
+    def ver_contenido(self, filename:str):
+        for archivo in self.actual_dir.archivos:
+            if archivo.nombre==filename:
+                VistaContenido(archivo.nombre,archivo.contenido)
 
     
 
