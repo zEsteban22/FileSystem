@@ -1,6 +1,7 @@
 from ctypes import sizeof
 from typing_extensions import Self
 from numpy import size
+from datetime import datetime
 
 
 class Elemento:
@@ -10,10 +11,13 @@ class Elemento:
         self.id = Elemento.id
 
 class Archivo(Elemento):
-    def __init__(self, nombre, contenido):
+    def __init__(self, nombre, contenido,fecha_creacion = datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+                                    fecha_modificacion = datetime.now().strftime("%d/%m/%Y %H:%M:%S")):
         super().__init__()
         self.nombre = nombre
         self.contenido = contenido
+        self.fecha_creacion = fecha_creacion
+        self.fecha_modificacion = fecha_modificacion
 
 class Directorio(Elemento):
     def __init__(self, nombre:str, papá=None, abierto=False):
@@ -90,7 +94,12 @@ class FileSystem:
     def buscar_archivo(self, nombre:str):
         ruta=self.raiz.nombre+"/"
         self.hay_directorios(nombre,self.raiz,ruta)
+    #
 
+    def ver_propiedades(self, filename:str):
+        for archivo in self.actual_dir.archivos:
+            if archivo.nombre==filename:
+                print("Archivo: " + archivo.nombre + "\nFecha de creacion: " + archivo.fecha_creacion+"\nUltima modificacion: "+archivo.fecha_modificacion)
 
     
 
