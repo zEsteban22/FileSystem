@@ -7,7 +7,8 @@ def prueba1():
     import FileSystem
     from threading import Thread
     vista = Vista.Vista()
-    FileSystem = FileSystem.FileSystem()
+    FileSystem = vista.FileSystem
+    FileSystem.inicializar("S:")
     FileSystem.crear_archivo("archivo1.txt", "contenido1")
     FileSystem.crear_directorio("escritorio")
     FileSystem.cambiar_directorio("escritorio")
@@ -16,7 +17,7 @@ def prueba1():
     FileSystem.cambiar_directorio("juegos")
     FileSystem.crear_archivo("juego1.exe", "contenido2")
     FileSystem.crear_archivo("juego2.exe", "contenido3")
-    b = Button(vista, text='Actualizar árbol', command=lambda:vista.actualizarArbol(FileSystem.raiz))
-    b.grid(row=1, column=0)
+    FileSystem.crear_archivo("juego3.exe", "contenido4")
+    vista.actualizarArbol()
     vista.mainloop()
 prueba1()
