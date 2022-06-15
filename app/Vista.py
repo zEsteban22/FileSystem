@@ -16,12 +16,12 @@ class Vista(Tk):
         self.console.insert(END, ">>> ")
         self.console.grid(row=1, column=0, sticky='nsew')
         self.console.bind("<Return>", self.procesar_comando)
+        self.console.bind("<Key>", self.procesar_tecla)
         self.icono_archivo = PhotoImage(file='assets/archivo.png')
         self.icono_directorio = PhotoImage(file='assets/directorio.png')
         self.FileSystem = FileSystem()
     def tree_click(self, event):
         self.FileSystem.tocar(int(self.tree.focus()))
-    
     def procesar_comando(self,event):
         comando = self.console.get("end-1c linestart+4c", "end-1c")
         respuesta = self.FileSystem.procesar_comando(comando)
@@ -33,6 +33,16 @@ class Vista(Tk):
         except:
             pass
         return "break"
+    def procesar_tecla(self,event):
+        line, col = self.console.index("insert").split('.')
+        if int(col) < 4:
+            return "break"
+        if str(int(line) + 1) != self.console.index('end').split('.')[0]:
+            return "break"
+        if event.keycode == 46 and int(col) < 4:
+            return "break"
+        if len(event.char) > 0 and ord(event.char) == 8 and int(col) < 5:
+            return "break"
     def actualizarArbol(self):
         r = self.FileSystem.raiz
         self.tree.delete(*self.tree.get_children())
@@ -44,8 +54,3 @@ class Vista(Tk):
         for directorio in raiz.directorios:
             self.tree.insert(raiz.id, END, image=self.icono_directorio, text=directorio.nombre, iid=directorio.id, open=directorio.abierto)
             self.generarArbol(directorio)
-
-if __name__ == "__main__":
-    Vista().mainloop()
-else:
-    print(__name__)
