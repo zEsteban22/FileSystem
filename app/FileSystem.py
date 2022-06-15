@@ -33,10 +33,10 @@ class FileSystem:
         for directorio in r.directorios:
             if directorio.id == id:
                 directorio.abierto = directorio.abierto == False
-                return True
-            if self.tocar(directorio, id):
-                return True
-        return False        
+                return directorio.abierto
+            self.tocar(directorio, id)
+        return False
+        
     def crear_archivo(self, nombre:str, contenido:str):
         archivo = Archivo(nombre, contenido)
         self.actual_dir.archivos.append(archivo)
@@ -75,12 +75,4 @@ class FileSystem:
             return self.abrir_archivo(comando[1])
         else:
             return "Comando no reconocido."
-
-    def mod_archivo(self, nombre:str, contenido:str):
-        archivo = self.actual_dir.archivos[nombre]
-        archivo.contenido = contenido
-
-    def ver_archivo(self, nombre:str):
-        archivo = self.actual_dir.archivos[nombre]
-        print(archivo.nombre+ "\n"+ archivo.contenido)
 
