@@ -92,11 +92,12 @@ class FileSystem:
         rutas=""
         for dir in directorio.directorios:
             rutas = rutas + self.buscar_aqui(nombre,dir,ruta+dir.nombre+"/")
-
         for archivo in directorio.archivos:
             rutas = rutas + self.arch(nombre,archivo,ruta)
-
-        return rutas
+        if rutas == "":
+            return "No se encontraron coincidencias"
+        else:
+            return rutas
 
     def buscar_archivo(self, nombre:str):
         ruta=self.raiz.nombre+"/"
