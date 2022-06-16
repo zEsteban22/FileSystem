@@ -21,6 +21,8 @@ class Archivo(Elemento):
         self.contenido = contenido
         self.fecha_creacion = fecha_creacion
         self.fecha_modificacion = fecha_modificacion
+    def propiedades(self):
+        return "Archivo: " + self.nombre + "\nFecha de creación: " + self.fecha_creacion+"\nUltima modificación: "+self.fecha_modificacion
 
 class Directorio(Elemento):
     def __init__(self, nombre:str, papá=None, abierto=False):
@@ -98,17 +100,17 @@ class FileSystem:
         ruta=self.raiz.nombre+"/"
         self.hay_directorios(nombre,self.raiz,ruta)
     #
+    #
+    #def ver_propiedades(self, filename:str):
+    #    for archivo in self.actual_dir.archivos:
+    #        if archivo.nombre==filename:
+    #            text = 
+    #            VistaPropiedades(text)
 
-    def ver_propiedades(self, filename:str):
-        for archivo in self.actual_dir.archivos:
-            if archivo.nombre==filename:
-                text = ("Archivo: " + archivo.nombre + "\nFecha de creacion: " + archivo.fecha_creacion+"\nUltima modificacion: "+archivo.fecha_modificacion)
-                VistaPropiedades(text)
-
-    def ver_contenido(self, filename:str):
-        for archivo in self.actual_dir.archivos:
-            if archivo.nombre==filename:
-                VistaContenido(archivo.nombre,archivo.contenido)
+    #def ver_contenido(self, filename:str):
+    #    for archivo in self.actual_dir.archivos:
+    #        if archivo.nombre==filename:
+    #            VistaContenido(archivo.nombre,archivo.contenido)
 
     
 

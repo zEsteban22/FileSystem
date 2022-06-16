@@ -14,9 +14,9 @@ def prueba1():
     FileSystem.crear_archivo("juego2.exe", "contenido3")
     FileSystem.crear_archivo("juego3.exe", "contenido4")
 
-    FileSystem.buscar_archivo("jue")
-    FileSystem.ver_propiedades("juego1.exe")
-    FileSystem.ver_contenido("juego1.exe")
+    #FileSystem.buscar_archivo("jue")
+    #FileSystem.ver_propiedades("juego1.exe")
+    #FileSystem.ver_contenido("juego1.exe")
 
     vista.actualizarArbol()
     vista.mainloop()

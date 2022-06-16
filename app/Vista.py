@@ -1,6 +1,27 @@
-from tkinter import Button, PhotoImage, Text, Tk, ttk, END
+from tkinter import Button, Label, Menu, PhotoImage, Text, Tk, ttk, END
 from FileSystem import FileSystem, Archivo, Directorio
 
+class VistaContenido(Tk):
+    def __init__(self,nombre:str,cont:str):
+        super().__init__()
+        self.title(nombre)
+        self.geometry("350x300")
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
+        label = Label(self,text=cont)
+        label.grid(row=0, column=0, sticky='nw')
+
+
+class VistaPropiedades(Tk):
+    def __init__(self,props:str):
+        super().__init__()
+        self.title("Propiedades del Archivo")
+        self.geometry("350x300")
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
+        label = Label(self,text=props)
+        label.grid(row=0, column=0, sticky='nsew')
+        
 class Vista(Tk):
     def __init__(self):
         super().__init__()
@@ -8,20 +29,58 @@ class Vista(Tk):
         self.geometry("400x600")
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
+
         self.tree = ttk.Treeview(self)
         self.tree.grid(row=0, column=0, sticky='nsew')
         self.tree.bind("<<TreeviewOpen>>", self.tree_click)
         self.tree.bind("<<TreeviewClose>>", self.tree_click)
+
+        self.menu_click_derecho = Menu(self, tearoff=0)
+        self.menu_click_derecho.add_command(label="Abrir", command=self.abrir_archivo)
+        self.menu_click_derecho.add_command(label="Eliminar", command=self.eliminar_archivo)
+        #self.menu_click_derecho.add_command(label="Renombrar", command=self.renombrar_archivo)
+        self.menu_click_derecho.add_command(label="Propiedades", command=self.ver_propiedades)
+        self.tree.bind("<Button-3>", self.menu_click_derecho_click)
+        
         self.console = Text(self)
         self.console.insert(END, ">>> ")
         self.console.grid(row=1, column=0, sticky='nsew')
         self.console.bind("<Return>", self.procesar_comando)
         self.console.bind("<Key>", self.procesar_tecla)
+        
         self.icono_archivo = PhotoImage(file='assets/archivo.png')
         self.icono_directorio = PhotoImage(file='assets/directorio.png')
+        
+        
         self.FileSystem = FileSystem()
+    
+    
     def tree_click(self, event):
         self.FileSystem.tocar(int(self.tree.focus()))
+
+    def abrir_archivo(self):
+        tree_selection = self.tree.selection()
+        print(tree_selection)
+        if len(tree_selection) == 1:
+            archivo = self.FileSystem.get_archivo(int(tree_selection[0]))
+            if isinstance(archivo,Archivo):
+                VistaContenido(archivo.nombre,archivo.contenido)
+
+    
+    def eliminar_archivo(self):
+        self.FileSystem.eliminar_archivo(int(self.tree.focus()))
+        self.actualizarArbol()
+
+    def ver_propiedades(self):
+        tree_selection = self.tree.selection()
+        if len(tree_selection) == 1:
+            archivo = self.FileSystem.get_archivo(int(tree_selection[0]))
+            if isinstance(archivo,Archivo):
+                VistaPropiedades(archivo.propiedades())
+
+    def menu_click_derecho_click(self,event):
+        self.menu_click_derecho.tk_popup(event.x_root, event.y_root)
+
     def procesar_comando(self,event):
         comando = self.console.get("end-1c linestart+4c", "end-1c")
         respuesta = self.FileSystem.procesar_comando(comando)
