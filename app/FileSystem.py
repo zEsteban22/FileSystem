@@ -1,6 +1,5 @@
 from ctypes import sizeof
 from hashlib import new
-from typing_extensions import Self
 from numpy import size
 from datetime import datetime
 from VistaPropiedades import *
@@ -43,15 +42,17 @@ class FileSystem:
         self.actual_dir = self.raiz = Directorio(nombre, abierto=True)
         return "Disco creado con éxito."
 
-    def tocar(self, id, r=None):
+    def tocar(self, id, r = None) -> bool:
         if r is None:
             r = self.raiz
         for directorio in r.directorios:
             if directorio.id == id:
                 directorio.abierto = directorio.abierto == False
                 return directorio.abierto
-            self.tocar(directorio, id)
-        return False
+            abierto = self.tocar(id, directorio)
+            if abierto is not None:
+                return abierto    
+        return None
         
     def crear_archivo(self, nombre:str, contenido:str):
         archivo = Archivo(nombre, contenido)
@@ -72,6 +73,59 @@ class FileSystem:
                 return "Cambiado al directorio " + nombre
         return "No se encontró el directorio"
 
+    def propiedades(self, id):
+        for archivo in self.raiz.archivos:
+            if archivo.id == id:
+                return archivo.propiedades()
+
+        def propiedades_recursivo(r = self.raiz):
+            for directorio in r.directorios:
+                #if directorio.id == id:
+                #   return directorio.propiedades() ##No implementado
+                for archivo in directorio.archivos:
+                    if archivo.id == id:
+                        return archivo.propiedades()
+                propiedades = propiedades_recursivo(directorio)
+                if propiedades != None:
+                    return propiedades
+            return None
+
+        return propiedades_recursivo()
+
+    def contenido(self, id):
+        for archivo in self.raiz.archivos:
+            if archivo.id == id:
+                return archivo.contenido
+        
+        def contenido_recursivo(r = self.raiz):
+            for directorio in r.directorios:
+                for archivo in directorio.archivos:
+                    if archivo.id == id:
+                        return archivo.contenido
+                contenido = contenido_recursivo(directorio)
+                if contenido != None:
+                    return contenido
+            return None
+        
+        return contenido_recursivo()
+
+    def get_archivo_id(self,id):
+        for archivo in self.raiz.archivos:
+            if archivo.id == id:
+                return archivo
+        
+        def get_archivo_id_recursivo(r = self.raiz):
+            for directorio in r.directorios:
+                for archivo in directorio.archivos:
+                    if archivo.id == id:
+                        return archivo
+                archivo = get_archivo_id_recursivo(directorio)
+                if archivo != None:
+                    return archivo
+            return None
+        
+        return get_archivo_id_recursivo()
+
     def abrir_archivo(self, nombre:str):
         for archivo in self.actual_dir.archivos:
             if archivo.nombre == nombre:
@@ -83,22 +137,27 @@ class FileSystem:
             if archivo.nombre==nombre:
                 self.actual_dir.archivos.remove(archivo)
 
-    #Las siguientes tres funciones son de la funcionalidad de buscar archivos
-    def buscar_aqui(self,nombre:str, dir:Directorio,ruta:str):
-        for archivo in dir.archivos:
-            if nombre in archivo.nombre:
-                print("Se encontró: " + ruta+ archivo.nombre)
+    #Las siguientes 3 funciones son de la funcionalidad de buscar archivos
+    def arch(self,nombre:str, archivo:Archivo,ruta:str):
+        if nombre in archivo.nombre:
+            return ruta+ archivo.nombre+"\n"
+        else:
+            return ""
 
-    def hay_directorios(self,nombre:str,directorio:Directorio,ruta:str):
-        self.buscar_aqui(nombre,directorio,ruta)
-        if size(directorio.directorios)>=1:
-            for dir in directorio.directorios:
-                print(dir.nombre)
-                return self.hay_directorios(nombre,dir,ruta+dir.nombre+"/")
+    def buscar_aqui(self,nombre:str, directorio:Directorio,ruta:str):
+        rutas=""
+        for dir in directorio.directorios:
+            rutas = rutas + self.buscar_aqui(nombre,dir,ruta+dir.nombre+"/")
+        for archivo in directorio.archivos:
+            rutas = rutas + self.arch(nombre,archivo,ruta)
+        if rutas == "":
+            return "No se encontraron coincidencias"
+        else:
+            return rutas
 
     def buscar_archivo(self, nombre:str):
         ruta=self.raiz.nombre+"/"
-        self.hay_directorios(nombre,self.raiz,ruta)
+        return self.buscar_aqui(nombre,self.raiz,ruta)
     #
     #
     #def ver_propiedades(self, filename:str):

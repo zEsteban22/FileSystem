@@ -40,7 +40,7 @@ class Vista(Tk):
         self.menu_click_derecho.add_command(label="Eliminar", command=self.eliminar_archivo)
         #self.menu_click_derecho.add_command(label="Renombrar", command=self.renombrar_archivo)
         self.menu_click_derecho.add_command(label="Propiedades", command=self.ver_propiedades)
-        self.tree.bind("<Button-3>", self.menu_click_derecho_click)
+        self.tree.bind("<Button-3>", self.desplegar_menu_click_derecho)
         
         self.console = Text(self)
         self.console.insert(END, ">>> ")
@@ -59,12 +59,9 @@ class Vista(Tk):
         self.FileSystem.tocar(int(self.tree.focus()))
 
     def abrir_archivo(self):
-        tree_selection = self.tree.selection()
-        print(tree_selection)
-        if len(tree_selection) == 1:
-            archivo = self.FileSystem.get_archivo(int(tree_selection[0]))
-            if isinstance(archivo,Archivo):
-                VistaContenido(archivo.nombre,archivo.contenido)
+        for iid in self.tree.selection():
+            archivo = self.FileSystem.get_archivo_id(int(iid))
+            VistaContenido(archivo.nombre,archivo.contenido)
 
     
     def eliminar_archivo(self):
@@ -74,11 +71,12 @@ class Vista(Tk):
     def ver_propiedades(self):
         tree_selection = self.tree.selection()
         if len(tree_selection) == 1:
-            archivo = self.FileSystem.get_archivo(int(tree_selection[0]))
-            if isinstance(archivo,Archivo):
-                VistaPropiedades(archivo.propiedades())
+            VistaPropiedades(self.FileSystem.propiedades(int(tree_selection[0])))
 
-    def menu_click_derecho_click(self,event):
+    def desplegar_menu_click_derecho(self,event):
+        if len(self.tree.selection()) <= 1:
+            #select item at mouse position
+            self.tree.selection_set(self.tree.identify_row(event.y))
         self.menu_click_derecho.tk_popup(event.x_root, event.y_root)
 
     def procesar_comando(self,event):
