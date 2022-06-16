@@ -81,22 +81,26 @@ class FileSystem:
             if archivo.nombre==nombre:
                 self.actual_dir.archivos.remove(archivo)
 
-    #Las siguientes tres funciones son de la funcionalidad de buscar archivos
-    def buscar_aqui(self,nombre:str, dir:Directorio,ruta:str):
-        for archivo in dir.archivos:
-            if nombre in archivo.nombre:
-                print("Se encontró: " + ruta+ archivo.nombre)
+    #Las siguientes 2 funciones son de la funcionalidad de buscar archivos
+    def arch(self,nombre:str, archivo:Archivo,ruta:str):
+        if nombre in archivo.nombre:
+            return ruta+ archivo.nombre+"\n"
+        else:
+            return ""
 
-    def hay_directorios(self,nombre:str,directorio:Directorio,ruta:str):
-        self.buscar_aqui(nombre,directorio,ruta)
-        if size(directorio.directorios)>=1:
-            for dir in directorio.directorios:
-                print(dir.nombre)
-                return self.hay_directorios(nombre,dir,ruta+dir.nombre+"/")
+    def buscar_aqui(self,nombre:str, directorio:Directorio,ruta:str):
+        rutas=""
+        for dir in directorio.directorios:
+            rutas = rutas + self.buscar_aqui(nombre,dir,ruta+dir.nombre+"/")
+
+        for archivo in directorio.archivos:
+            rutas = rutas + self.arch(nombre,archivo,ruta)
+
+        return rutas
 
     def buscar_archivo(self, nombre:str):
         ruta=self.raiz.nombre+"/"
-        self.hay_directorios(nombre,self.raiz,ruta)
+        return self.buscar_aqui(nombre,self.raiz,ruta)
     #
 
     def ver_propiedades(self, filename:str):
