@@ -81,7 +81,7 @@ class FileSystem:
             if archivo.nombre==nombre:
                 self.actual_dir.archivos.remove(archivo)
 
-    #Las siguientes 2 funciones son de la funcionalidad de buscar archivos
+    #Las siguientes 3 funciones son de la funcionalidad de buscar archivos
     def arch(self,nombre:str, archivo:Archivo,ruta:str):
         if nombre in archivo.nombre:
             return ruta+ archivo.nombre+"\n"
