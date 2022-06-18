@@ -65,12 +65,20 @@ class FileSystem:
         return None
         
     def crear_archivo(self, nombre:str, contenido:str):
+        for arch in self.actual_dir.archivos:
+            if nombre == arch.nombre:
+                return "Ya existe un archivo con ese nombre"
         archivo = Archivo(nombre, contenido)
         self.actual_dir.archivos.append(archivo)
+        return "Archivo creado correctamente"
 
     def crear_directorio(self, nombre:str):
+        for dir in self.actual_dir.directorios:
+            if nombre == dir.nombre:
+                return "Ya existe un directorio con ese nombre"
         directorio = Directorio(nombre, self.actual_dir)
         self.actual_dir.directorios.append(directorio)
+        return "Directorio creado correctamente"
 
     def cambiar_directorio(self, nombre:str):
         if nombre == '..':
@@ -195,11 +203,9 @@ class FileSystem:
         elif comando[0] == "cd":
             return self.cambiar_directorio(comando[1])
         elif comando[0] == "mkdir":
-            self.crear_directorio(comando[1])
-            return "Creado el directorio " + comando[1]
+            return self.crear_directorio(comando[1])
         elif comando[0] == "mkfile":
-            self.crear_archivo(comando[1], comando[2])
-            return "Creado el archivo " + comando[1]
+            return self.crear_archivo(comando[1], comando[2])
         elif comando[0] == "cat":
             return self.abrir_archivo(comando[1])
         elif comando[0] == "find":
