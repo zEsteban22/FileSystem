@@ -82,8 +82,7 @@ class Vista(Tk):
     def procesar_comando(self,event):
         comando = self.console.get("end-1c linestart+4c", "end-1c")
         respuesta = self.FileSystem.procesar_comando(comando)
-        self.console.insert(END, "\n")
-        self.console.insert(END, respuesta)
+        self.console.insert(END, "\n"+respuesta)
         self.console.insert(END, "\n"+self.FileSystem.get_actual_dir())
         self.console.insert(END, "\n>>> ")
         try:
