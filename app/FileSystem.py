@@ -63,13 +63,15 @@ class FileSystem:
     def cambiar_directorio(self, nombre:str):
         if nombre == '..':
             if self.actual_dir.papá is None:
-                return "No se puede cambiar al directorio padre"
+                return "No existe directorio padre"
             self.actual_dir = self.actual_dir.papá
-        for directorio in self.actual_dir.directorios:
-            if directorio.nombre == nombre:
-                self.actual_dir = directorio
-                return "Cambiado al directorio " + nombre
-        return "No se encontró el directorio"
+            return "Regresando al directorio " + self.actual_dir.nombre
+        else:
+            for directorio in self.actual_dir.directorios:
+                if directorio.nombre == nombre:
+                    self.actual_dir = directorio
+                    return "Cambiado al directorio " + nombre
+            return "No se encontró el directorio"
 
     def propiedades(self, id):
         for archivo in self.raiz.archivos:
@@ -179,8 +181,7 @@ class FileSystem:
         if comando[0] == "inicializar":
             return self.inicializar(comando[1], int(comando[2]), int(comando[3])) 
         elif comando[0] == "cd":
-            self.cambiar_directorio(comando[1])
-            return "Cambiado al directorio " + comando[1]
+            return self.cambiar_directorio(comando[1])
         elif comando[0] == "mkdir":
             self.crear_directorio(comando[1])
             return "Creado el directorio " + comando[1]
