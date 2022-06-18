@@ -84,6 +84,7 @@ class Vista(Tk):
         respuesta = self.FileSystem.procesar_comando(comando)
         self.console.insert(END, "\n")
         self.console.insert(END, respuesta)
+        self.console.insert(END, "\n"+self.FileSystem.get_actual_dir())
         self.console.insert(END, "\n>>> ")
         try:
             self.actualizarArbol()

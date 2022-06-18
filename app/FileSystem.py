@@ -1,5 +1,6 @@
 from ctypes import sizeof
 from hashlib import new
+from tkinter import StringVar
 from numpy import size
 from datetime import datetime
 
@@ -40,6 +41,17 @@ class FileSystem:
         self.actual_dir = self.raiz = Directorio(nombre, abierto=True)
         return "Disco creado con éxito."
 
+    def get_actual_dir(self):
+        ruta=self.actual_dir.nombre
+        def actual_dir_recursivo(ruta,dir:Directorio):
+            if dir.papá != None:
+                padre = dir.papá
+                ruta = padre.nombre+"/"+ruta
+                return actual_dir_recursivo(ruta,padre)
+            else:
+                return ruta
+        return actual_dir_recursivo(ruta,self.actual_dir)
+
     def tocar(self, id, r = None) -> bool:
         if r is None:
             r = self.raiz
@@ -65,12 +77,12 @@ class FileSystem:
             if self.actual_dir.papá is None:
                 return "No existe directorio padre"
             self.actual_dir = self.actual_dir.papá
-            return "Regresando al directorio " + self.actual_dir.nombre
+            return ""
         else:
             for directorio in self.actual_dir.directorios:
                 if directorio.nombre == nombre:
                     self.actual_dir = directorio
-                    return "Cambiado al directorio " + nombre
+                    return ""
             return "No se encontró el directorio"
 
     def propiedades(self, id):
