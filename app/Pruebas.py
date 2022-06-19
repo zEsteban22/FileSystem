@@ -15,4 +15,15 @@ def prueba1():
     FileSystem.crear_archivo("juego3.exe", "contenido4")
     vista.actualizarArbol()
     vista.mainloop()
-prueba1()
+def prueba2():
+    from DiskManager import DiskManager
+    disco = DiskManager('1', 4, 4)
+    disco.escribir("as.txt","aaaa")
+    disco.escribir("bs.txt","bb")
+    assert disco.escribir("cs.txt","cccccccccc") == -1
+    disco.eliminar("as.txt")
+    disco.escribir("cs.txt","cccccccccc")
+    with open("Discos/Disco 1.txt", "r") as f:
+        assert f.readline() == 'ccccbb  cccccc  '
+  
+prueba2()
