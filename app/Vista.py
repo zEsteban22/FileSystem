@@ -66,10 +66,10 @@ class Vista(Tk):
         for iid in self.tree.selection():
             archivo = self.FileSystem.get_archivo_id(int(iid))
             VistaContenido(archivo.nombre,archivo.contenido)
-
     
     def eliminar_archivo(self):
-        self.FileSystem.eliminar_archivo(int(self.tree.focus()))
+        for iid in self.tree.selection():
+            self.FileSystem.borrar_seleccionado(int(iid))
         self.actualizarArbol()
 
     def ver_propiedades(self):

@@ -5,6 +5,8 @@ from numpy import size
 from datetime import datetime
 from abc import ABC, abstractmethod
 
+from urllib3 import Retry
+
 class Elemento(ABC):
     id = 0
     def __init__(self,fecha_creacion = datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
@@ -127,6 +129,29 @@ class FileSystem:
         for archivo in self.actual_dir.archivos:
             if archivo.nombre==nombre:
                 self.actual_dir.archivos.remove(archivo)
+                return("Archivo eliminado correctamente")
+        return("No se encontró el Archivo")
+
+    def borrar_directorio(self, nombre:str):
+        for dir in self.actual_dir.directorios:
+            if dir.nombre==nombre:
+                self.actual_dir.directorios.remove(dir)
+                return("Directorio eliminado correctamente")
+        return("No se encontró el directorio")
+
+    def borrar_seleccionado(self,id):
+        def buscar(directorio):
+            for arch in directorio.archivos:
+                if arch.id == id:
+                    directorio.archivos.remove(arch)
+                    return ("Archivo elimiando")
+            for dir in directorio.directorios:
+                if dir.id == id:
+                    directorio.directorios.remove(dir)
+                    return ("Directorio eliminado")
+            for dir in directorio.directorios:
+                buscar(dir)
+        buscar(self.raiz)
 
     #Las siguientes 3 funciones son de la funcionalidad de buscar archivos
     def arch(self,nombre:str, archivo:Archivo,ruta:str):
@@ -165,6 +190,10 @@ class FileSystem:
             return self.abrir_archivo(comando[1])
         elif comando[0] == "find":
             return self.buscar_archivo(comando[1])
+        elif comando[0] == "delDir":
+            return self.borrar_directorio(comando[1])
+        elif comando[0] == "delFile":
+            return self.borrar_archivo(comando[1])
         else:
             return "Comando no reconocido."
 
