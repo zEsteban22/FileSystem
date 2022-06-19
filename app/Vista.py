@@ -43,7 +43,8 @@ class Vista(Tk):
         self.tree.bind("<Button-3>", self.desplegar_menu_click_derecho)
         
         self.console = Text(self)
-        self.console.insert(END, ">>> ")
+        self.console.insert(END, self.FileSystem.get_actual_dir())
+        self.console.insert(END, "\n>>> ")
         self.console.grid(row=1, column=0, sticky='nsew')
         self.console.bind("<Return>", self.procesar_comando)
         self.console.bind("<Key>", self.procesar_tecla)
