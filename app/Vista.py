@@ -32,8 +32,8 @@ class Vista(Tk):
 
         self.tree = ttk.Treeview(self)
         self.tree.grid(row=0, column=0, sticky='nsew')
-        self.tree.bind("<<TreeviewOpen>>", self.tree_click)
-        self.tree.bind("<<TreeviewClose>>", self.tree_click)
+        self.tree.bind("<<TreeviewOpen>>", self.tree_open)
+        self.tree.bind("<<TreeviewClose>>", self.tree_close)
 
         self.menu_click_derecho = Menu(self, tearoff=0)
         self.menu_click_derecho.add_command(label="Abrir", command=self.abrir_archivo)
@@ -51,12 +51,16 @@ class Vista(Tk):
         self.icono_archivo = PhotoImage(file='assets/archivo.png')
         self.icono_directorio = PhotoImage(file='assets/directorio.png')
         
+        self.abiertos = []
         
         self.FileSystem = FileSystem()
     
     
-    def tree_click(self, event):
-        self.FileSystem.tocar(int(self.tree.focus()))
+    def tree_close(self, event):
+        self.abiertos.remove(int(self.tree.focus()))
+
+    def tree_open(self, event):
+        self.abiertos += [int(self.tree.focus())]
 
     def abrir_archivo(self):
         for iid in self.tree.selection():
@@ -90,6 +94,7 @@ class Vista(Tk):
         except:
             pass
         return "break"
+
     def procesar_tecla(self,event):
         line, col = self.console.index("insert").split('.')
         if int(col) < 4:
@@ -100,14 +105,16 @@ class Vista(Tk):
             return "break"
         if len(event.char) > 0 and ord(event.char) == 8 and int(col) < 5:
             return "break"
+
     def actualizarArbol(self):
         r = self.FileSystem.raiz
         self.tree.delete(*self.tree.get_children())
-        self.tree.insert('', END, image=self.icono_directorio, text=r.nombre, iid=r.id, open=r.abierto)
+        self.tree.insert('', END, image=self.icono_directorio, text=r.nombre, iid=r.id, open=True) 
         self.generarArbol(r)
+
     def generarArbol(self,raiz:Directorio):
         for archivo in raiz.archivos:
             self.tree.insert(raiz.id, END, image=self.icono_archivo, text=archivo.nombre, iid=archivo.id, open=False)
         for directorio in raiz.directorios:
-            self.tree.insert(raiz.id, END, image=self.icono_directorio, text=directorio.nombre, iid=directorio.id, open=directorio.abierto)
+            self.tree.insert(raiz.id, END, image=self.icono_directorio, text=directorio.nombre, iid=directorio.id, open=directorio.id in self.abiertos)
             self.generarArbol(directorio)

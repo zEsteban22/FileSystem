@@ -3,22 +3,25 @@ from hashlib import new
 from tkinter import StringVar
 from numpy import size
 from datetime import datetime
+from abc import ABC, abstractmethod
 
-
-class Elemento:
+class Elemento(ABC):
     id = 0
-    def __init__(self):
+    def __init__(self,fecha_creacion = datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+                                    fecha_modificacion = datetime.now().strftime("%d/%m/%Y %H:%M:%S")):
         Elemento.id += 1
         self.id = Elemento.id
+        self.fecha_creacion = fecha_creacion
+        self.fecha_modificacion = fecha_modificacion
+    @abstractmethod
+    def propiedades(self):
+        pass
 
 class Archivo(Elemento):
-    def __init__(self, nombre, contenido,fecha_creacion = datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-                                    fecha_modificacion = datetime.now().strftime("%d/%m/%Y %H:%M:%S")):
+    def __init__(self, nombre, contenido):
         super().__init__()
         self.nombre = nombre
         self.contenido = contenido
-        self.fecha_creacion = fecha_creacion
-        self.fecha_modificacion = fecha_modificacion
     def propiedades(self):
         return "Archivo: " + self.nombre + "\nFecha de creación: " + self.fecha_creacion+"\nUltima modificación: "+self.fecha_modificacion
 
@@ -28,8 +31,11 @@ class Directorio(Elemento):
         self.nombre = nombre
         self.archivos = []
         self.directorios = []
-        self.abierto = abierto
         self.papá = papá
+    def propiedades(self):
+        return "Directorio: " + self.nombre + "\nFecha de creación: " + self.fecha_creacion+"\nUltima modificación: "+self.fecha_modificacion
+    def children(self):
+        return self.archivos + self.directorios
 
 class FileSystem:
     def __init__(self):
@@ -52,17 +58,6 @@ class FileSystem:
                 return ruta
         return actual_dir_recursivo(ruta,self.actual_dir)
 
-    def tocar(self, id, r = None) -> bool:
-        if r is None:
-            r = self.raiz
-        for directorio in r.directorios:
-            if directorio.id == id:
-                directorio.abierto = directorio.abierto == False
-                return directorio.abierto
-            abierto = self.tocar(id, directorio)
-            if abierto is not None:
-                return abierto    
-        return None
         
     def crear_archivo(self, nombre:str, contenido:str):
         for arch in self.actual_dir.archivos:
@@ -93,42 +88,6 @@ class FileSystem:
                     return ""
             return "No se encontró el directorio"
 
-    def propiedades(self, id):
-        for archivo in self.raiz.archivos:
-            if archivo.id == id:
-                return archivo.propiedades()
-
-        def propiedades_recursivo(r = self.raiz):
-            for directorio in r.directorios:
-                #if directorio.id == id:
-                #   return directorio.propiedades() ##No implementado
-                for archivo in directorio.archivos:
-                    if archivo.id == id:
-                        return archivo.propiedades()
-                propiedades = propiedades_recursivo(directorio)
-                if propiedades != None:
-                    return propiedades
-            return None
-
-        return propiedades_recursivo()
-
-    def contenido(self, id):
-        for archivo in self.raiz.archivos:
-            if archivo.id == id:
-                return archivo.contenido
-        
-        def contenido_recursivo(r = self.raiz):
-            for directorio in r.directorios:
-                for archivo in directorio.archivos:
-                    if archivo.id == id:
-                        return archivo.contenido
-                contenido = contenido_recursivo(directorio)
-                if contenido != None:
-                    return contenido
-            return None
-        
-        return contenido_recursivo()
-
     def get_archivo_id(self,id):
         for archivo in self.raiz.archivos:
             if archivo.id == id:
@@ -146,6 +105,18 @@ class FileSystem:
         
         return get_archivo_id_recursivo()
 
+    def propiedades(self, id):
+        archivo = self.get_archivo_id(id)
+        if archivo is None:
+            return "No se encontró el archivo"
+        return archivo.propiedades()
+
+    def ver_contenido(self, id):
+        archivo = self.get_archivo_id(id)
+        if archivo is None:
+            return "No se encontró el archivo"
+        return archivo.contenido
+        
     def abrir_archivo(self, nombre:str):
         for archivo in self.actual_dir.archivos:
             if archivo.nombre == nombre:
@@ -179,22 +150,6 @@ class FileSystem:
             return "No se encontraron coincidencias"
         else:
             return rutas
-    #
-    #
-    #def ver_propiedades(self, filename:str):
-    #    for archivo in self.actual_dir.archivos:
-    #        if archivo.nombre==filename:
-    #            text = 
-    #            VistaPropiedades(text)
-
-    #def ver_contenido(self, filename:str):
-    #    for archivo in self.actual_dir.archivos:
-    #        if archivo.nombre==filename:
-    #            VistaContenido(archivo.nombre,archivo.contenido)
-
-    
-
-    ###############################################################################
 
     def procesar_comando(self, comando:str):
         comando = comando.split(" ")
