@@ -175,6 +175,14 @@ class FileSystem:
             return "No se encontraron coincidencias"
         else:
             return rutas
+        
+    def modificar_archivo(self,nombre:str,contenido:str):
+        for arch in self.actual_dir.archivos:
+            if arch.nombre == nombre:
+                arch.contenido=contenido
+                arch.fecha_modificacion=datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                return "Modificacion Completada"
+        return "No se pudo encontrar el archivo"
 
     def procesar_comando(self, comando:str):
         comando = comando.split(" ")
@@ -185,7 +193,11 @@ class FileSystem:
         elif comando[0] == "mkdir":
             return self.crear_directorio(comando[1])
         elif comando[0] == "mkfile":
-            return self.crear_archivo(comando[1], comando[2])
+            text=""
+            for i in range(len(comando)):
+                if i >=2:
+                    text = text + " " +comando[i]
+            return self.crear_archivo(comando[1],text)
         elif comando[0] == "cat":
             return self.abrir_archivo(comando[1])
         elif comando[0] == "find":
@@ -194,6 +206,13 @@ class FileSystem:
             return self.borrar_directorio(comando[1])
         elif comando[0] == "delFile":
             return self.borrar_archivo(comando[1])
+        elif comando[0] == "mod":
+            text=""
+            for i in range(len(comando)):
+                if i >=2:
+                    text = text + " " +comando[i]
+            return self.modificar_archivo(comando[1],text)
+
         else:
             return "Comando no reconocido."
 
