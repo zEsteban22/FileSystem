@@ -5,6 +5,8 @@ from numpy import size
 from datetime import datetime
 from abc import ABC, abstractmethod
 
+from urllib3 import Retry
+
 class Elemento(ABC):
     id = 0
     def __init__(self,fecha_creacion = datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
@@ -127,6 +129,29 @@ class FileSystem:
         for archivo in self.actual_dir.archivos:
             if archivo.nombre==nombre:
                 self.actual_dir.archivos.remove(archivo)
+                return("Archivo eliminado correctamente")
+        return("No se encontró el Archivo")
+
+    def borrar_directorio(self, nombre:str):
+        for dir in self.actual_dir.directorios:
+            if dir.nombre==nombre:
+                self.actual_dir.directorios.remove(dir)
+                return("Directorio eliminado correctamente")
+        return("No se encontró el directorio")
+
+    def borrar_seleccionado(self,id):
+        def buscar(directorio):
+            for arch in directorio.archivos:
+                if arch.id == id:
+                    directorio.archivos.remove(arch)
+                    return ("Archivo elimiando")
+            for dir in directorio.directorios:
+                if dir.id == id:
+                    directorio.directorios.remove(dir)
+                    return ("Directorio eliminado")
+            for dir in directorio.directorios:
+                buscar(dir)
+        buscar(self.raiz)
 
     #Las siguientes 3 funciones son de la funcionalidad de buscar archivos
     def arch(self,nombre:str, archivo:Archivo,ruta:str):
@@ -150,6 +175,14 @@ class FileSystem:
             return "No se encontraron coincidencias"
         else:
             return rutas
+        
+    def modificar_archivo(self,nombre:str,contenido:str):
+        for arch in self.actual_dir.archivos:
+            if arch.nombre == nombre:
+                arch.contenido=contenido
+                arch.fecha_modificacion=datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                return "Modificacion Completada"
+        return "No se pudo encontrar el archivo"
 
     def procesar_comando(self, comando:str):
         comando = comando.split(" ")
@@ -160,11 +193,26 @@ class FileSystem:
         elif comando[0] == "mkdir":
             return self.crear_directorio(comando[1])
         elif comando[0] == "mkfile":
-            return self.crear_archivo(comando[1], comando[2])
+            text=""
+            for i in range(len(comando)):
+                if i >=2:
+                    text = text + " " +comando[i]
+            return self.crear_archivo(comando[1],text)
         elif comando[0] == "cat":
             return self.abrir_archivo(comando[1])
         elif comando[0] == "find":
             return self.buscar_archivo(comando[1])
+        elif comando[0] == "delDir":
+            return self.borrar_directorio(comando[1])
+        elif comando[0] == "delFile":
+            return self.borrar_archivo(comando[1])
+        elif comando[0] == "mod":
+            text=""
+            for i in range(len(comando)):
+                if i >=2:
+                    text = text + " " +comando[i]
+            return self.modificar_archivo(comando[1],text)
+
         else:
             return "Comando no reconocido."
 
