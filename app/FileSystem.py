@@ -184,23 +184,16 @@ class FileSystem:
                 return "Modificacion Completada"
         return "No se pudo encontrar el archivo"
 
-    def copiar(self, elemento:str, ruta:str):
-        def pegar(arch,rutas:str):
+    def buscar_ruta(self, rutas):
+        def busca(rutas:str):
             rutas=rutas.split('/')
             path=self.raiz
             if rutas[0] == self.raiz.nombre:
                 if len(rutas)==1:
-                    Elemento.id += 1
-                    arch.id=Elemento.id
-                    print(arch.id)
-                    if type(arch) == Directorio:
-                        path.directorios.append(arch)
-                    elif type(arch) == Archivo:
-                        path.archivos.append(arch)
-                    return "Copiado Correctamente"
+                    return path
             else:
                 return "La ruta ingresada no existe"
-            print(rutas[1:])
+
             for rut in rutas[1:]:
                 finded=False
                 for dir in path.directorios:
@@ -209,15 +202,26 @@ class FileSystem:
                         finded=True
                 if finded==False:
                     return "La ruta ingresada no existe"
+            return path
+        return busca(rutas)
 
-            Elemento.id += 1
-            arch.id=Elemento.id
-            print(arch.id)
-            if type(arch) == Directorio:
-                path.directorios.append(arch)
-            elif type(arch) == Archivo:
-                path.archivos.append(arch)
-            return "Copiado Correctamente"
+    def copiar(self, elemento:str, ruta:str):
+        path = self.buscar_ruta(ruta)
+        if type(path) == Directorio:
+            for arch in self.actual_dir.archivos:
+                if arch.nombre == elemento:
+                    Elemento.id += 1
+                    arch.id = Elemento.id
+                    print(arch.id)
+                    path.archivos.append(arch)
+                    return "Copiado Correctamente"
+            for dir in self.actual_dir.directorios:
+                if dir.nombre == elemento:
+                    Elemento.id += 1
+                    arch.id=Elemento.id     
+                    print(arch.id)
+                    path.directorios.append(arch)
+                    return "Copiado Correctamente"
 
         for arch in self.actual_dir.archivos:
             if arch.nombre == elemento:
@@ -227,10 +231,8 @@ class FileSystem:
                         f.write(arch.contenido)
                         return "Elemento copiado correctamente"
                 except:
-                    return pegar(arch,ruta)
-        for dir in self.actual_dir.directorios:
-            if dir.nombre == elemento:
-                return pegar(dir,ruta)
+                    return "Error al copiar"
+        return "Error al copiar"
 
     def procesar_comando(self, comando:str):
         comando = comando.split(" ")
