@@ -5,7 +5,9 @@ from numpy import size
 from datetime import datetime
 from abc import ABC, abstractmethod
 
-from urllib3 import Retry
+#from urllib3 import Retry
+
+from DiskManager import DiskManager
 
 class Elemento(ABC):
     id = 0
@@ -28,7 +30,7 @@ class Archivo(Elemento):
         return "Archivo: " + self.nombre + "\nFecha de creación: " + self.fecha_creacion+"\nUltima modificación: "+self.fecha_modificacion
 
 class Directorio(Elemento):
-    def __init__(self, nombre:str, papá=None, abierto=False):
+    def __init__(self, nombre:str, papá=None):
         super().__init__()
         self.nombre = nombre
         self.archivos = []
@@ -44,9 +46,10 @@ class FileSystem:
         pass
 
     def inicializar(self, nombre, cantidad_sectores:int = 10, tamaño_sector:int = 8):
+        self.diskManager = DiskManager(nombre, tamaño_sector, cantidad_sectores)
         self.cantidad_sectores = cantidad_sectores
         self.tamaño_sector = tamaño_sector
-        self.actual_dir = self.raiz = Directorio(nombre, abierto=True)
+        self.actual_dir = self.raiz = Directorio(nombre)
         return "Disco creado con éxito."
 
     def get_actual_dir(self):
@@ -66,6 +69,7 @@ class FileSystem:
             if nombre == arch.nombre:
                 return "Ya existe un archivo con ese nombre"
         archivo = Archivo(nombre, contenido)
+        self.diskManager.escribir(archivo.id,contenido)
         self.actual_dir.archivos.append(archivo)
         return "Archivo creado correctamente"
 
@@ -129,6 +133,7 @@ class FileSystem:
         for archivo in self.actual_dir.archivos:
             if archivo.nombre==nombre:
                 self.actual_dir.archivos.remove(archivo)
+                self.diskManager.eliminar(archivo.id)
                 return("Archivo eliminado correctamente")
         return("No se encontró el Archivo")
 

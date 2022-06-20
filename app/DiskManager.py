@@ -19,7 +19,7 @@ class DiskManager:
         with open(self.nombre, "r") as f:
             disco = f.readline()
         
-        if archivo not in self.sectores_por_archivo:
+        if archivo not in self.sectores_por_archivo: 
             sectores_ocupados = []
             for sectores in self.sectores_por_archivo.values():
                 sectores_ocupados += sectores
@@ -34,17 +34,17 @@ class DiskManager:
                     contenido = contenido[self.tamaño_sector:]
                     if cantidad_sectores == 0:
                         break
+            with open(self.nombre, "w") as f:
+                f.write(disco)
+                
         else:
-            for sector in self.sectores_por_archivo[archivo]:
-                disco = disco[:sector*self.tamaño_sector] + contenido[:self.tamaño_sector] + " " * (self.tamaño_sector - len(contenido[:self.tamaño_sector])) + disco[(sector + 1) * self.tamaño_sector:]
-                contenido = contenido[self.tamaño_sector:]
-            for i in range(cantidad_sectores, len(self.sectores_por_archivo[archivo])):
-                disco = disco[:self.sectores_por_archivo[archivo][-1]*self.tamaño_sector] + " " * self.tamaño_sector + disco[(self.sectores_por_archivo[archivo][-1] + 1) * self.tamaño_sector:]
-                self.sectores_por_archivo[archivo] = self.sectores_por_archivo[archivo][:-1]
-        
-        with open(self.nombre, "w") as f:
-            f.write(disco)
+            self.eliminar(archivo)
+            self.escribir(archivo,contenido)
+            
+
         return 0
+
+
     def eliminar(self, archivo):
         with open(self.nombre, "r") as f:
             disco = f.readline()

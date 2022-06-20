@@ -3,7 +3,7 @@ def prueba1():
     import FileSystem
     vista = Vista.Vista()
     FileSystem = vista.FileSystem
-    FileSystem.inicializar("S:")
+    FileSystem.inicializar("S")
     FileSystem.crear_archivo("archivo1.txt", "contenido1")
     FileSystem.crear_directorio("escritorio")
     FileSystem.cambiar_directorio("escritorio")
@@ -25,5 +25,12 @@ def prueba2():
     disco.escribir("cs.txt","cccccccccc")
     with open("Discos/Disco 1.txt", "r") as f:
         assert f.readline() == 'ccccbb  cccccc  '
-  
-prueba2()
+def prueba3():
+    from DiskManager import DiskManager
+    disco = DiskManager('2', 4, 4)
+    disco.escribir("a.txt","aaaa")
+    disco.escribir("b.txt","bb")
+    disco.escribir("a.txt","cccccccccc")
+    with open("Discos/Disco 2.txt", "r") as f:
+        assert f.readline() == 'ccccbb  cccccc  '
+prueba1()
