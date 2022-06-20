@@ -6,6 +6,7 @@ from numpy import size
 from datetime import datetime
 from abc import ABC, abstractmethod
 import ntpath
+from tkinter import messagebox
 
 from urllib3 import Retry
 
@@ -66,7 +67,13 @@ class FileSystem:
     def crear_archivo(self, nombre:str, contenido:str):
         for arch in self.actual_dir.archivos:
             if nombre == arch.nombre:
-                return "Ya existe un archivo con ese nombre"
+                res = messagebox.askquestion("askquestion", "Ya existe un archivo con ese nombre, desea reescribirlo?")
+                if res == "no":
+                    return "Operación Cancelada"
+                elif res == "yes":
+                    for archivo in self.actual_dir.archivos:
+                        if archivo.nombre==nombre:
+                            self.actual_dir.archivos.remove(archivo)
         archivo = Archivo(nombre, contenido)
         self.actual_dir.archivos.append(archivo)
         return "Archivo creado correctamente"
@@ -74,7 +81,13 @@ class FileSystem:
     def crear_directorio(self, nombre:str):
         for dir in self.actual_dir.directorios:
             if nombre == dir.nombre:
-                return "Ya existe un directorio con ese nombre"
+                res = messagebox.askquestion("askquestion", "Ya existe un directorio con ese nombre, desea reescribirlo?")
+                if res == "no":
+                    return "Operación Cancelada"
+                elif res == "yes":
+                    for dir in self.actual_dir.directorios:
+                        if dir.nombre==nombre:
+                            self.actual_dir.directorios.remove(dir)
         directorio = Directorio(nombre, self.actual_dir)
         self.actual_dir.directorios.append(directorio)
         return "Directorio creado correctamente"
