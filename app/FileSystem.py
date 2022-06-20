@@ -296,6 +296,39 @@ class FileSystem:
         else:
             return "Debe selecccionar un modo de copia"
 
+    def mover(self, elemento:str, ruta:str):
+        try:
+            path_origen=ntpath.dirname(elemento)
+            if path_origen[-1]=="/":
+                path_origen=path_origen[:-1]
+            path_origen = self.buscar_ruta(path_origen)
+            if type(path_origen) != Directorio:
+                path_origen = self.actual_dir
+        except:
+            path_origen=self.actual_dir
+        elemento=ntpath.basename(elemento)
+        path = self.buscar_ruta(ruta)
+        if type(path) == Directorio:
+            for arch in path_origen.archivos:
+                if arch.nombre == elemento:
+                    archivo=copy(arch)
+                    Elemento.id += 1
+                    archivo.id = Elemento.id
+                    path_origen.archivos.remove(arch)
+                    path.archivos.append(archivo)
+                    return "Movido Correctamente"
+            for dir in path_origen.directorios:
+                if dir.nombre == elemento:
+                    directorio=copy(dir)
+                    Elemento.id += 1
+                    directorio.id=Elemento.id     
+                    path_origen.directorios.remove(dir)
+                    path.directorios.append(directorio)
+                    return "Movido Correctamente"
+            return "No se encontró el Archivo"
+        else:
+            return "No se encontró el directorio de destino"
+
     def procesar_comando(self, comando:str):
         comando = comando.split(" ")
         if comando[0] == "inicializar":
@@ -326,7 +359,8 @@ class FileSystem:
             return self.modificar_archivo(comando[1],text)
         elif comando[0] == "copy":
             return self.copiar(comando[2],comando[3],comando[1])
-
+        elif comando[0] == "mov":
+            return self.mover(comando[1],comando[2])
         else:
             return "Comando no reconocido."
 
