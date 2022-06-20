@@ -209,6 +209,7 @@ class FileSystem:
                         finded=True
                 if finded==False:
                     return "La ruta ingresada no existe"
+
             Elemento.id += 1
             arch.id=Elemento.id
             print(arch.id)
@@ -218,10 +219,15 @@ class FileSystem:
                 path.archivos.append(arch)
             return "Copiado Correctamente"
 
-
         for arch in self.actual_dir.archivos:
             if arch.nombre == elemento:
-                return pegar(arch,ruta)
+                try:
+                    print(ruta+"/"+elemento)
+                    with open(ruta+"/"+elemento, 'w') as f:
+                        f.write(arch.contenido)
+                        return "Elemento copiado correctamente"
+                except:
+                    return pegar(arch,ruta)
         for dir in self.actual_dir.directorios:
             if dir.nombre == elemento:
                 return pegar(dir,ruta)
