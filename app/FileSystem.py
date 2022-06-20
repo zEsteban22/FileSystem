@@ -5,6 +5,7 @@ from tkinter import StringVar
 from numpy import size
 from datetime import datetime
 from abc import ABC, abstractmethod
+import ntpath
 
 from urllib3 import Retry
 
@@ -186,15 +187,14 @@ class FileSystem:
         return "No se pudo encontrar el archivo"
 
     def buscar_ruta(self, rutas):
-        def busca(rutas:str):
-            rutas=rutas.split('/')
-            path=self.raiz
-            if rutas[0] == self.raiz.nombre:
-                if len(rutas)==1:
-                    return path
-            else:
-                return "La ruta ingresada no existe"
-
+        rutas=rutas.split('/')
+        path = self.raiz
+        if rutas[0] == self.raiz.nombre:
+            if len(rutas)==1:
+                return path
+        else:
+            return "La ruta ingresada no existe"
+        def busca(rutas,path):
             for rut in rutas[1:]:
                 finded=False
                 for dir in path.directorios:
@@ -204,28 +204,51 @@ class FileSystem:
                 if finded==False:
                     return "La ruta ingresada no existe"
             return path
-        return busca(rutas)
+        return busca(rutas,path)
 
     def copiar(self, elemento:str, ruta:str, modo:str):
         if modo == "-v":
+            try:
+                path_origen=ntpath.dirname(elemento)
+                if path_origen[-1]=="/":
+                    path_origen=path_origen[:-1]
+                path_origen = self.buscar_ruta(path_origen)
+                if type(path_origen) != Directorio:
+                    path_origen = self.actual_dir
+            except:
+                path_origen=self.actual_dir
+            elemento=ntpath.basename(elemento)
             path = self.buscar_ruta(ruta)
             if type(path) == Directorio:
-                for arch in self.actual_dir.archivos:
+                for arch in path_origen.archivos:
                     if arch.nombre == elemento:
                         archivo=copy(arch)
                         Elemento.id += 1
                         archivo.id = Elemento.id
                         path.archivos.append(archivo)
                         return "Copiado Correctamente"
-                for dir in self.actual_dir.directorios:
+                for dir in path_origen.directorios:
                     if dir.nombre == elemento:
                         directorio=copy(dir)
                         Elemento.id += 1
                         directorio.id=Elemento.id     
                         path.directorios.append(directorio)
                         return "Copiado Correctamente"
+                return "No se encontró el Archivo"
+            else:
+                return "No se encontró el directorio de destino"
         elif modo == "-vl":
-            for arch in self.actual_dir.archivos:
+            try:
+                path_origen=ntpath.dirname(elemento)
+                if path_origen[-1]=="/":
+                    path_origen=path_origen[:-1]
+                path_origen = self.buscar_ruta(path_origen)
+                if type(path_origen) != Directorio:
+                    path_origen = self.actual_dir
+            except:
+                path_origen=self.actual_dir
+            elemento=ntpath.basename(elemento)
+            for arch in path_origen.archivos:
                 if arch.nombre == elemento:
                     try:
                         print(ruta+"/"+elemento)
