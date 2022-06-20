@@ -43,6 +43,7 @@ class Vista(Tk):
         self.tree.bind("<Button-3>", self.desplegar_menu_click_derecho)
         
         self.console = Text(self)
+        #self.console.insert(END, self.FileSystem.get_actual_dir())
         self.console.insert(END, "\n>>> ")
         self.console.grid(row=1, column=0, sticky='nsew')
         self.console.bind("<Return>", self.procesar_comando)
@@ -63,9 +64,13 @@ class Vista(Tk):
         self.abiertos += [int(self.tree.focus())]
 
     def abrir_archivo(self):
+        print(self.tree.selection())
         for iid in self.tree.selection():
             archivo = self.FileSystem.get_archivo_id(int(iid))
-            VistaContenido(archivo.nombre,archivo.contenido)
+            try:
+                VistaContenido(archivo.nombre,archivo.contenido)
+            except:
+                pass
     
     def eliminar_archivo(self):
         for iid in self.tree.selection():

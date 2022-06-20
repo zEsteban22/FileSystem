@@ -1,9 +1,12 @@
+from copy import copy
 from ctypes import sizeof
 from hashlib import new
 from tkinter import StringVar
 from numpy import size
 from datetime import datetime
 from abc import ABC, abstractmethod
+import ntpath
+from tkinter import messagebox
 
 #from urllib3 import Retry
 
@@ -67,7 +70,13 @@ class FileSystem:
     def crear_archivo(self, nombre:str, contenido:str):
         for arch in self.actual_dir.archivos:
             if nombre == arch.nombre:
-                return "Ya existe un archivo con ese nombre"
+                res = messagebox.askquestion("askquestion", "Ya existe un archivo con ese nombre, desea reescribirlo?")
+                if res == "no":
+                    return "Operación Cancelada"
+                elif res == "yes":
+                    for archivo in self.actual_dir.archivos:
+                        if archivo.nombre==nombre:
+                            self.actual_dir.archivos.remove(archivo)
         archivo = Archivo(nombre, contenido)
         self.diskManager.escribir(archivo.id,contenido)
         self.actual_dir.archivos.append(archivo)
@@ -76,7 +85,13 @@ class FileSystem:
     def crear_directorio(self, nombre:str):
         for dir in self.actual_dir.directorios:
             if nombre == dir.nombre:
-                return "Ya existe un directorio con ese nombre"
+                res = messagebox.askquestion("askquestion", "Ya existe un directorio con ese nombre, desea reescribirlo?")
+                if res == "no":
+                    return "Operación Cancelada"
+                elif res == "yes":
+                    for dir in self.actual_dir.directorios:
+                        if dir.nombre==nombre:
+                            self.actual_dir.directorios.remove(dir)
         directorio = Directorio(nombre, self.actual_dir)
         self.actual_dir.directorios.append(directorio)
         return "Directorio creado correctamente"
@@ -189,6 +204,136 @@ class FileSystem:
                 return "Modificacion Completada"
         return "No se pudo encontrar el archivo"
 
+    def buscar_ruta(self, rutas):
+        rutas=rutas.split('/')
+        path = self.raiz
+        if rutas[0] == self.raiz.nombre:
+            if len(rutas)==1:
+                return path
+        else:
+            return "La ruta ingresada no existe"
+        def busca(rutas,path):
+            for rut in rutas[1:]:
+                finded=False
+                for dir in path.directorios:
+                    if dir.nombre == rut:
+                        path=dir
+                        finded=True
+                if finded==False:
+                    return "La ruta ingresada no existe"
+            return path
+        return busca(rutas,path)
+
+    def copiar(self, elemento:str, ruta:str, modo:str):
+        if modo == "-v":
+            try:
+                path_origen=ntpath.dirname(elemento)
+                if path_origen[-1]=="/":
+                    path_origen=path_origen[:-1]
+                path_origen = self.buscar_ruta(path_origen)
+                if type(path_origen) != Directorio:
+                    path_origen = self.actual_dir
+            except:
+                path_origen=self.actual_dir
+            elemento=ntpath.basename(elemento)
+            path = self.buscar_ruta(ruta)
+            if type(path) == Directorio:
+                for arch in path_origen.archivos:
+                    if arch.nombre == elemento:
+                        archivo=copy(arch)
+                        Elemento.id += 1
+                        archivo.id = Elemento.id
+                        path.archivos.append(archivo)
+                        return "Copiado Correctamente"
+                for dir in path_origen.directorios:
+                    if dir.nombre == elemento:
+                        directorio=copy(dir)
+                        Elemento.id += 1
+                        directorio.id=Elemento.id     
+                        path.directorios.append(directorio)
+                        return "Copiado Correctamente"
+                return "No se encontró el Archivo"
+            else:
+                return "No se encontró el directorio de destino"
+        elif modo == "-vl":
+            try:
+                path_origen=ntpath.dirname(elemento)
+                if path_origen[-1]=="/":
+                    path_origen=path_origen[:-1]
+                path_origen = self.buscar_ruta(path_origen)
+                if type(path_origen) != Directorio:
+                    path_origen = self.actual_dir
+            except:
+                path_origen=self.actual_dir
+            elemento=ntpath.basename(elemento)
+            for arch in path_origen.archivos:
+                if arch.nombre == elemento:
+                    try:
+                        print(ruta+"/"+elemento)
+                        with open(ruta+"/"+elemento, 'w') as f:
+                            f.write(arch.contenido)
+                            return "Elemento copiado correctamente"
+                    except:
+                        return "Error al copiar"
+            return "Error al copiar"
+            
+        elif modo == "-lv":
+            nombre=elemento.split("/")[-1]
+            print("Nombre: ",nombre)
+            texto=""
+            print(elemento)
+            try:
+                with open(elemento, 'r') as f:
+                    texto=f.read()
+                    print(texto)
+            except:
+                return "No se encontró el archivo local"
+            
+            path = self.buscar_ruta(ruta)
+            if type(path) == Directorio:
+                for arch in path.archivos:
+                    if nombre == arch.nombre:
+                        return "Ya existe un archivo con ese nombre"
+                archivo = Archivo(nombre, texto)
+                path.archivos.append(archivo)
+                return "Archivo copiado correctamente"
+
+        else:
+            return "Debe selecccionar un modo de copia"
+
+    def mover(self, elemento:str, ruta:str):
+        try:
+            path_origen=ntpath.dirname(elemento)
+            if path_origen[-1]=="/":
+                path_origen=path_origen[:-1]
+            path_origen = self.buscar_ruta(path_origen)
+            if type(path_origen) != Directorio:
+                path_origen = self.actual_dir
+        except:
+            path_origen=self.actual_dir
+        elemento=ntpath.basename(elemento)
+        path = self.buscar_ruta(ruta)
+        if type(path) == Directorio:
+            for arch in path_origen.archivos:
+                if arch.nombre == elemento:
+                    archivo=copy(arch)
+                    Elemento.id += 1
+                    archivo.id = Elemento.id
+                    path_origen.archivos.remove(arch)
+                    path.archivos.append(archivo)
+                    return "Movido Correctamente"
+            for dir in path_origen.directorios:
+                if dir.nombre == elemento:
+                    directorio=copy(dir)
+                    Elemento.id += 1
+                    directorio.id=Elemento.id     
+                    path_origen.directorios.remove(dir)
+                    path.directorios.append(directorio)
+                    return "Movido Correctamente"
+            return "No se encontró el Archivo"
+        else:
+            return "No se encontró el directorio de destino"
+
     def procesar_comando(self, comando:str):
         comando = comando.split(" ")
         if comando[0] == "inicializar":
@@ -217,7 +362,10 @@ class FileSystem:
                 if i >=2:
                     text = text + " " +comando[i]
             return self.modificar_archivo(comando[1],text)
-
+        elif comando[0] == "copy":
+            return self.copiar(comando[2],comando[3],comando[1])
+        elif comando[0] == "mov":
+            return self.mover(comando[1],comando[2])
         else:
             return "Comando no reconocido."
 
