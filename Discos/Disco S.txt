@@ -1,0 +1,1 @@
+contenido1      print('hola mundo')     contenido2      contenido3              
