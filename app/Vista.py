@@ -64,6 +64,7 @@ class Vista(Tk):
         self.abiertos += [int(self.tree.focus())]
 
     def abrir_archivo(self):
+        print(self.tree.selection())
         for iid in self.tree.selection():
             archivo = self.FileSystem.get_archivo_id(int(iid))
             try:

@@ -1,3 +1,4 @@
+from copy import copy
 from ctypes import sizeof
 from hashlib import new
 from tkinter import StringVar
@@ -205,34 +206,59 @@ class FileSystem:
             return path
         return busca(rutas)
 
-    def copiar(self, elemento:str, ruta:str):
-        path = self.buscar_ruta(ruta)
-        if type(path) == Directorio:
+    def copiar(self, elemento:str, ruta:str, modo:str):
+        if modo == "-v":
+            path = self.buscar_ruta(ruta)
+            if type(path) == Directorio:
+                for arch in self.actual_dir.archivos:
+                    if arch.nombre == elemento:
+                        archivo=copy(arch)
+                        Elemento.id += 1
+                        archivo.id = Elemento.id
+                        path.archivos.append(archivo)
+                        return "Copiado Correctamente"
+                for dir in self.actual_dir.directorios:
+                    if dir.nombre == elemento:
+                        directorio=copy(dir)
+                        Elemento.id += 1
+                        directorio.id=Elemento.id     
+                        path.directorios.append(directorio)
+                        return "Copiado Correctamente"
+        elif modo == "-vl":
             for arch in self.actual_dir.archivos:
                 if arch.nombre == elemento:
-                    Elemento.id += 1
-                    arch.id = Elemento.id
-                    print(arch.id)
-                    path.archivos.append(arch)
-                    return "Copiado Correctamente"
-            for dir in self.actual_dir.directorios:
-                if dir.nombre == elemento:
-                    Elemento.id += 1
-                    arch.id=Elemento.id     
-                    print(arch.id)
-                    path.directorios.append(arch)
-                    return "Copiado Correctamente"
+                    try:
+                        print(ruta+"/"+elemento)
+                        with open(ruta+"/"+elemento, 'w') as f:
+                            f.write(arch.contenido)
+                            return "Elemento copiado correctamente"
+                    except:
+                        return "Error al copiar"
+            return "Error al copiar"
+            
+        elif modo == "-lv":
+            nombre=elemento.split("/")[-1]
+            print("Nombre: ",nombre)
+            texto=""
+            print(elemento)
+            try:
+                with open(elemento, 'r') as f:
+                    texto=f.read()
+                    print(texto)
+            except:
+                return "No se encontró el archivo local"
+            
+            path = self.buscar_ruta(ruta)
+            if type(path) == Directorio:
+                for arch in path.archivos:
+                    if nombre == arch.nombre:
+                        return "Ya existe un archivo con ese nombre"
+                archivo = Archivo(nombre, texto)
+                path.archivos.append(archivo)
+                return "Archivo copiado correctamente"
 
-        for arch in self.actual_dir.archivos:
-            if arch.nombre == elemento:
-                try:
-                    print(ruta+"/"+elemento)
-                    with open(ruta+"/"+elemento, 'w') as f:
-                        f.write(arch.contenido)
-                        return "Elemento copiado correctamente"
-                except:
-                    return "Error al copiar"
-        return "Error al copiar"
+        else:
+            return "Debe selecccionar un modo de copia"
 
     def procesar_comando(self, comando:str):
         comando = comando.split(" ")
@@ -263,7 +289,7 @@ class FileSystem:
                     text = text + " " +comando[i]
             return self.modificar_archivo(comando[1],text)
         elif comando[0] == "copy":
-            return self.copiar(comando[1],comando[2])
+            return self.copiar(comando[2],comando[3],comando[1])
 
         else:
             return "Comando no reconocido."
