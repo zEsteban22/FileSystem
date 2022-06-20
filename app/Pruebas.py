@@ -26,4 +26,4 @@ def prueba2():
     with open("Discos/Disco 1.txt", "r") as f:
         assert f.readline() == 'ccccbb  cccccc  '
   
-prueba2()
+prueba1()

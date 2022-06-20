@@ -184,6 +184,48 @@ class FileSystem:
                 return "Modificacion Completada"
         return "No se pudo encontrar el archivo"
 
+    def copiar(self, elemento:str, ruta:str):
+        def pegar(arch,rutas:str):
+            rutas=rutas.split('/')
+            path=self.raiz
+            if rutas[0] == self.raiz.nombre:
+                if len(rutas)==1:
+                    Elemento.id += 1
+                    arch.id=Elemento.id
+                    print(arch.id)
+                    if type(arch) == Directorio:
+                        path.directorios.append(arch)
+                    elif type(arch) == Archivo:
+                        path.archivos.append(arch)
+                    return "Copiado Correctamente"
+            else:
+                return "La ruta ingresada no existe"
+            print(rutas[1:])
+            for rut in rutas[1:]:
+                finded=False
+                for dir in path.directorios:
+                    if dir.nombre == rut:
+                        path=dir
+                        finded=True
+                if finded==False:
+                    return "La ruta ingresada no existe"
+            Elemento.id += 1
+            arch.id=Elemento.id
+            print(arch.id)
+            if type(arch) == Directorio:
+                path.directorios.append(arch)
+            elif type(arch) == Archivo:
+                path.archivos.append(arch)
+            return "Copiado Correctamente"
+
+
+        for arch in self.actual_dir.archivos:
+            if arch.nombre == elemento:
+                return pegar(arch,ruta)
+        for dir in self.actual_dir.directorios:
+            if dir.nombre == elemento:
+                return pegar(dir,ruta)
+
     def procesar_comando(self, comando:str):
         comando = comando.split(" ")
         if comando[0] == "inicializar":
@@ -212,6 +254,8 @@ class FileSystem:
                 if i >=2:
                     text = text + " " +comando[i]
             return self.modificar_archivo(comando[1],text)
+        elif comando[0] == "copy":
+            return self.copiar(comando[1],comando[2])
 
         else:
             return "Comando no reconocido."
