@@ -16,6 +16,10 @@ def prueba1():
     FileSystem.crear_archivo("juego1.exe", "contenido2")
     FileSystem.crear_archivo("juego2.exe", "contenido3")
     FileSystem.crear_archivo("juego3.exe", "contenido4")
+    FileSystem.modificar_archivo("juego3.exe", "Este es el juego 3")
+    FileSystem.copiar("S/archivo1.txt", "S/escritorio","-v")
+    FileSystem.copiar("juego1.exe", "Archivos","-vl")
+    #FileSystem.borrar_archivo("juego3.exe")
     vista.actualizarArbol()
     vista.mainloop()
 def prueba2():
