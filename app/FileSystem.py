@@ -82,9 +82,11 @@ class FileSystem:
         archivo = Archivo(nombre, contenido)
         if idViejo != 0:
             archivo.id = idViejo
-        self.diskManager.escribir(archivo.id,contenido)
-        self.actual_dir.archivos.append(archivo)
-        return "Archivo creado correctamente"
+        if self.diskManager.escribir(archivo.id,contenido) == 0:
+            self.actual_dir.archivos.append(archivo)
+            return "Archivo creado correctamente"
+        else:
+            return "No se pudo crear el archivo debido a que no hay espacio en el disco."
 
     def crear_directorio(self, nombre:str):
         for dir in self.actual_dir.directorios:
@@ -204,9 +206,14 @@ class FileSystem:
     def modificar_archivo(self,nombre:str,contenido:str):
         for arch in self.actual_dir.archivos:
             if arch.nombre == nombre:
-                arch.contenido=contenido
-                arch.fecha_modificacion=datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-                return "Modificacion Completada"
+                if self.diskManager.escribir(arch.id,contenido) == 0:
+                    arch.contenido=contenido
+                    arch.fecha_modificacion=datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                    return "Archivo modificado correctamente"
+                else:
+                    self.diskManager.escribir(arch.id,arch.contenido)
+                    return "No se pudo modificar el archivo debido a que no hay espacio suficiente en el disco."
+                    
         return "No se pudo encontrar el archivo"
 
     def buscar_ruta(self, rutas):
@@ -246,10 +253,13 @@ class FileSystem:
                 for arch in path_origen.archivos:
                     if arch.nombre == elemento:
                         archivo=copy(arch)
-                        Elemento.id += 1
-                        archivo.id = Elemento.id
-                        path.archivos.append(archivo)
-                        return "Copiado Correctamente"
+                        if self.diskManager.escribir(archivo.id,archivo.contenido) == 0:
+                            Elemento.id += 1
+                            archivo.id = Elemento.id
+                            path.archivos.append(archivo)
+                            return "Archivo copiado correctamente"
+                        else:
+                            return "No se pudo copiar el archivo debido a que no hay espacio suficiente en el disco."
                 for dir in path_origen.directorios:
                     if dir.nombre == elemento:
                         directorio=copy(dir)

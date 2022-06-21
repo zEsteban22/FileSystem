@@ -1,6 +1,5 @@
-from random import randint
 from math import ceil
-import os
+
 class DiskManager:
     def __init__(self, nombre, tamaño_sector, cantidad_sectores):
         self.sectores_por_archivo = {}
@@ -36,13 +35,11 @@ class DiskManager:
                         break
             with open(self.nombre, "w") as f:
                 f.write(disco)
+            return 0
                 
         else:
             self.eliminar(archivo)
-            self.escribir(archivo,contenido)
-            
-
-        return 0
+            return self.escribir(archivo,contenido)
 
 
     def eliminar(self, archivo):
