@@ -328,7 +328,9 @@ class FileSystem:
 
     def mover(self, elemento:str, ruta:str):
         try:
-            path_origen=ntpath.dirname(elemento)
+            path_origen = ntpath.dirname(elemento)
+            nuevo_nombre = ntpath.basename(ruta)
+            ruta = ntpath.dirname(ruta)
             if path_origen[-1]=="/":
                 path_origen=path_origen[:-1]
             if nombre_no_valido(path_origen):
@@ -346,6 +348,7 @@ class FileSystem:
                     archivo=copy(arch)
                     Elemento.id += 1
                     archivo.id = Elemento.id
+                    archivo.nombre=nuevo_nombre
                     path_origen.archivos.remove(arch)
                     path.archivos.append(archivo)
                     return "Movido Correctamente"
