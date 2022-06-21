@@ -1,7 +1,10 @@
 def prueba1():
     import Vista
     import FileSystem
+
     vista = Vista.Vista()
+    
+    
     FileSystem = vista.FileSystem
     FileSystem.inicializar("S")
     FileSystem.crear_archivo("archivo1.txt", "contenido1")

@@ -68,6 +68,7 @@ class FileSystem:
 
         
     def crear_archivo(self, nombre:str, contenido:str):
+        idViejo = 0
         for arch in self.actual_dir.archivos:
             if nombre == arch.nombre:
                 res = messagebox.askquestion("askquestion", "Ya existe un archivo con ese nombre, desea reescribirlo?")
@@ -77,7 +78,10 @@ class FileSystem:
                     for archivo in self.actual_dir.archivos:
                         if archivo.nombre==nombre:
                             self.actual_dir.archivos.remove(archivo)
+                            idViejo = archivo.id
         archivo = Archivo(nombre, contenido)
+        if idViejo != 0:
+            archivo.id = idViejo
         self.diskManager.escribir(archivo.id,contenido)
         self.actual_dir.archivos.append(archivo)
         return "Archivo creado correctamente"
@@ -164,6 +168,7 @@ class FileSystem:
             for arch in directorio.archivos:
                 if arch.id == id:
                     directorio.archivos.remove(arch)
+                    self.diskManager.eliminar(id)
                     return ("Archivo elimiando")
             for dir in directorio.directorios:
                 if dir.id == id:
@@ -306,6 +311,8 @@ class FileSystem:
             path_origen=ntpath.dirname(elemento)
             if path_origen[-1]=="/":
                 path_origen=path_origen[:-1]
+            if nombre_no_valido(path_origen):
+                return "Nombre del archivo a mover no válido"
             path_origen = self.buscar_ruta(path_origen)
             if type(path_origen) != Directorio:
                 path_origen = self.actual_dir
@@ -337,26 +344,51 @@ class FileSystem:
     def procesar_comando(self, comando:str):
         comando = comando.split(" ")
         if comando[0] == "inicializar":
-            return self.inicializar(comando[1], int(comando[2]), int(comando[3])) 
+            if len(comando) != 4:
+                return "El comando inicializar debe tener 3 argumentos: nombre, tamaño de los sectores y cantidad de sectores."
+            elif nombre_no_valido(comando[1]):
+                return "El nombre del disco no es válido"
+            try:
+                comando[2] = int(comando[2])
+                comando[3] = int(comando[3])
+                return self.inicializar(comando[1], comando[2], comando[3])
+            except:
+                return "El tamaño de los sectores y la cantidad de sectores deben ser enteros."
         elif comando[0] == "cd":
+            if nombre_no_valido(comando[1]):
+                return "El nombre del directorio no es válido"
             return self.cambiar_directorio(comando[1])
         elif comando[0] == "mkdir":
+            if nombre_no_valido(comando[1]):
+                return "El nombre del directorio no es válido"
             return self.crear_directorio(comando[1])
         elif comando[0] == "mkfile":
             text=""
             for i in range(len(comando)):
                 if i >=2:
                     text = text + " " +comando[i]
+            if nombre_no_valido(comando[1]):
+                return "El nombre del archivo no es válido"
             return self.crear_archivo(comando[1],text)
         elif comando[0] == "cat":
+            if nombre_no_valido(comando[1]):
+                return "El nombre del archivo no es válido"
             return self.abrir_archivo(comando[1])
         elif comando[0] == "find":
+            if nombre_no_valido(comando[1]):
+                return "El nombre del archivo no es válido"
             return self.buscar_archivo(comando[1])
         elif comando[0] == "delDir":
+            if nombre_no_valido(comando[1]):
+                return "El nombre del directorio no es válido"
             return self.borrar_directorio(comando[1])
         elif comando[0] == "delFile":
+            if nombre_no_valido(comando[1]):
+                return "El nombre del archivo no es válido"
             return self.borrar_archivo(comando[1])
         elif comando[0] == "mod":
+            if nombre_no_valido(comando[1]):
+                return "El nombre del archivo no es válido"
             text=""
             for i in range(len(comando)):
                 if i >=2:
@@ -368,4 +400,8 @@ class FileSystem:
             return self.mover(comando[1],comando[2])
         else:
             return "Comando no reconocido."
-
+def nombre_no_valido(nombre_directorio):
+    for i in nombre_directorio:
+        if i not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.$":
+            return True
+    return False

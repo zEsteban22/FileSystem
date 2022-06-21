@@ -102,14 +102,11 @@ class Vista(Tk):
 
     def procesar_tecla(self,event):
         line, col = self.console.index("insert").split('.')
-        if int(col) < 4:
+        
+        if int(col) < 4 or str(int(line) + 1) != self.console.index('end').split('.')[0] or event.keycode == 46 and int(col) < 4 or len(event.char) > 0 and ord(event.char) == 8 and int(col) < 5:
+            self.console.mark_set('insert','end')
             return "break"
-        if str(int(line) + 1) != self.console.index('end').split('.')[0]:
-            return "break"
-        if event.keycode == 46 and int(col) < 4:
-            return "break"
-        if len(event.char) > 0 and ord(event.char) == 8 and int(col) < 5:
-            return "break"
+        
 
     def actualizarArbol(self):
         r = self.FileSystem.raiz
