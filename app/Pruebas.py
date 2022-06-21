@@ -6,7 +6,7 @@ def prueba1():
     
     
     FileSystem = vista.FileSystem
-    FileSystem.inicializar("S")
+    FileSystem.inicializar("S", 16, 8)
     FileSystem.crear_archivo("archivo1.txt", "contenido1")
     FileSystem.crear_directorio("escritorio")
     FileSystem.cambiar_directorio("escritorio")
@@ -15,13 +15,16 @@ def prueba1():
     FileSystem.cambiar_directorio("juegos")
     FileSystem.crear_archivo("juego1.exe", "contenido2")
     FileSystem.crear_archivo("juego2.exe", "contenido3")
-    FileSystem.crear_archivo("juego3.exe", "contenido4")
+    FileSystem.crear_archivo("juego3.exe", "cont")
     FileSystem.modificar_archivo("juego3.exe", "Este es el juego 3")
     FileSystem.copiar("S/archivo1.txt", "S/escritorio","-v")
     FileSystem.copiar("juego1.exe", "Archivos","-vl")
-    #FileSystem.borrar_archivo("juego3.exe")
+    FileSystem.borrar_archivo("juego3.exe")
+    FileSystem.copiar("Archivos/juego1.exe", "S/escritorio","-lv")
     vista.actualizarArbol()
     vista.mainloop()
+
+
 def prueba2():
     from DiskManager import DiskManager
     disco = DiskManager('1', 4, 4)

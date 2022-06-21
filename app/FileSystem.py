@@ -159,9 +159,16 @@ class FileSystem:
         return("No se encontró el Archivo")
 
     def borrar_directorio(self, nombre:str):
+        def borrar_directorio_recursivo(directorio):
+            for archivo in directorio.archivos:
+                self.diskManager.eliminar(archivo.id)
+            for directorio in directorio.directorios:
+                borrar_directorio_recursivo(directorio)
+
         for dir in self.actual_dir.directorios:
             if dir.nombre==nombre:
                 self.actual_dir.directorios.remove(dir)
+                borrar_directorio_recursivo(dir)
                 return("Directorio eliminado correctamente")
         return("No se encontró el directorio")
 
@@ -253,7 +260,7 @@ class FileSystem:
                 for arch in path_origen.archivos:
                     if arch.nombre == elemento:
                         archivo=copy(arch)
-                        if self.diskManager.escribir(archivo.id,archivo.contenido) == 0:
+                        if self.diskManager.escribir(Elemento.id + 1,archivo.contenido) == 0:
                             Elemento.id += 1
                             archivo.id = Elemento.id
                             path.archivos.append(archivo)
@@ -287,7 +294,7 @@ class FileSystem:
                         print(ruta+"/"+elemento)
                         with open(ruta+"/"+elemento, 'w') as f:
                             f.write(arch.contenido)
-                            return "Elemento copiado correctamente"
+                        return "Elemento copiado correctamente"
                     except:
                         return "Error al copiar"
             return "Error al copiar"
@@ -310,11 +317,14 @@ class FileSystem:
                     if nombre == arch.nombre:
                         return "Ya existe un archivo con ese nombre"
                 archivo = Archivo(nombre, texto)
-                path.archivos.append(archivo)
-                return "Archivo copiado correctamente"
+                if self.diskManager.escribir(archivo.id,texto) == 0:
+                    path.archivos.append(archivo)
+                    return "Archivo copiado correctamente"
+                else:
+                    return "No se pudo copiar el archivo debido a que no hay espacio suficiente en el disco."
 
         else:
-            return "Debe selecccionar un modo de copia"
+            return "Debe seleccionar un modo de copia válido."
 
     def mover(self, elemento:str, ruta:str):
         try:
@@ -353,6 +363,8 @@ class FileSystem:
 
     def procesar_comando(self, comando:str):
         comando = comando.split(" ")
+        if len(comando) == 0:
+            return "Ingrese un comando."
         if comando[0] == "inicializar":
             if len(comando) != 4:
                 return "El comando inicializar debe tener 3 argumentos: nombre, tamaño de los sectores y cantidad de sectores."
@@ -365,14 +377,20 @@ class FileSystem:
             except:
                 return "El tamaño de los sectores y la cantidad de sectores deben ser enteros."
         elif comando[0] == "cd":
+            if len(comando) != 2:
+                return "El comando cd debe tener 1 argumento: ruta."
             if nombre_no_valido(comando[1]):
                 return "El nombre del directorio no es válido"
             return self.cambiar_directorio(comando[1])
         elif comando[0] == "mkdir":
+            if len(comando) != 2:
+                return "El comando mkdir debe tener 1 argumento: nombre."
             if nombre_no_valido(comando[1]):
                 return "El nombre del directorio no es válido"
             return self.crear_directorio(comando[1])
         elif comando[0] == "mkfile":
+            if len(comando) <= 2:
+                return "El comando mkfile debe tener dos argumentos: nombre y contenido."
             text=""
             for i in range(len(comando)):
                 if i >=2:
@@ -381,22 +399,32 @@ class FileSystem:
                 return "El nombre del archivo no es válido"
             return self.crear_archivo(comando[1],text)
         elif comando[0] == "cat":
+            if len(comando) != 2:
+                return "El comando cat debe tener 1 argumento: ruta."
             if nombre_no_valido(comando[1]):
                 return "El nombre del archivo no es válido"
             return self.abrir_archivo(comando[1])
         elif comando[0] == "find":
+            if len(comando) != 2:
+                return "El comando find debe tener 1 argumento: nombre."
             if nombre_no_valido(comando[1]):
                 return "El nombre del archivo no es válido"
             return self.buscar_archivo(comando[1])
         elif comando[0] == "delDir":
+            if len(comando) != 2:
+                return "El comando delDir debe tener 1 argumento: nombre."
             if nombre_no_valido(comando[1]):
                 return "El nombre del directorio no es válido"
             return self.borrar_directorio(comando[1])
         elif comando[0] == "delFile":
+            if len(comando) != 2:
+                return "El comando delFile debe tener 1 argumento: nombre."
             if nombre_no_valido(comando[1]):
                 return "El nombre del archivo no es válido"
             return self.borrar_archivo(comando[1])
         elif comando[0] == "mod":
+            if len(comando) != 3:
+                return "El comando mod debe tener 2 argumentos: nombre y contenido."
             if nombre_no_valido(comando[1]):
                 return "El nombre del archivo no es válido"
             text=""
@@ -405,8 +433,12 @@ class FileSystem:
                     text = text + " " +comando[i]
             return self.modificar_archivo(comando[1],text)
         elif comando[0] == "copy":
+            if len(comando) != 4:
+                return "El comando copy debe tener 3 argumentos: modo, origen y destino.\nEl modo -lv es para copiar de ruta local a ruta virtual, el modo -vl es para copar de ruta virtual a ruta local y el modo -v es para copiar de ruta virtual a ruta virtual."
             return self.copiar(comando[2],comando[3],comando[1])
         elif comando[0] == "mov":
+            if len(comando) != 3:
+                return "El comando mov debe tener 2 argumentos: origen y destino."
             return self.mover(comando[1],comando[2])
         else:
             return "Comando no reconocido."
