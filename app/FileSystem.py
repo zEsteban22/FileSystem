@@ -333,8 +333,6 @@ class FileSystem:
             ruta = ntpath.dirname(ruta)
             if path_origen[-1]=="/":
                 path_origen=path_origen[:-1]
-            if nombre_no_valido(path_origen):
-                return "Nombre del archivo a mover no válido"
             path_origen = self.buscar_ruta(path_origen)
             if type(path_origen) != Directorio:
                 path_origen = self.actual_dir
@@ -348,15 +346,16 @@ class FileSystem:
                     archivo=copy(arch)
                     Elemento.id += 1
                     archivo.id = Elemento.id
-                    archivo.nombre=nuevo_nombre
+                    if nuevo_nombre != "":
+                        archivo.nombre=nuevo_nombre
                     path_origen.archivos.remove(arch)
                     path.archivos.append(archivo)
                     return "Movido Correctamente"
             for dir in path_origen.directorios:
                 if dir.nombre == elemento:
                     directorio=copy(dir)
-                    Elemento.id += 1
-                    directorio.id=Elemento.id     
+                    if nuevo_nombre != "":
+                        directorio.nombre=nuevo_nombre
                     path_origen.directorios.remove(dir)
                     path.directorios.append(directorio)
                     return "Movido Correctamente"
