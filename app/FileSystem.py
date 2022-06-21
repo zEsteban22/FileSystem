@@ -182,6 +182,7 @@ class FileSystem:
             for dir in directorio.directorios:
                 if dir.id == id:
                     directorio.directorios.remove(dir)
+                    self.borrar_directorio(dir.nombre)
                     return ("Directorio eliminado")
             for dir in directorio.directorios:
                 buscar(dir)
