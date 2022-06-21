@@ -1,15 +1,8 @@
 from copy import copy
-from ctypes import sizeof
-from hashlib import new
-from tkinter import StringVar
-from numpy import size
 from datetime import datetime
 from abc import ABC, abstractmethod
 import ntpath
 from tkinter import messagebox
-
-#from urllib3 import Retry
-
 from DiskManager import DiskManager
 
 class Elemento(ABC):
